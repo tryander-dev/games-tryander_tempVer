@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>games.tryander.space | Lite Version</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TryAnder Games - Облегчённая версия сайта из-за технических неполадок. Доступно скачивание The-75-School-2.">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Roboto Mono', monospace; }
+    body { background:#0a0a0a; color:#f0f0f0; min-height:100vh; overflow-x:hidden; display: flex; flex-direction: column; }
+
+    /* Кастомный скроллбар */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(128, 128, 128, 0.3); backdrop-filter: blur(4px); border-radius: 4px; transition: background 0.3s; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(128, 128, 128, 0.5); }
+
+    .fade-in-up { opacity: 0; transform: translateY(15px); animation: fadeInUp 0.8s forwards; }
+    @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+    header {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:16px 32px; background:rgba(30,30,30,0.35); backdrop-filter:blur(8px);
+      border-bottom:1px solid rgba(255,255,255,0.07); position:sticky; top:0; z-index:100;
+    }
+    .brand { font-weight:500; font-size:1.2rem; color:#fff; letter-spacing: 1px; }
+
+    .container { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; padding: 24px 20px; }
+
+    /* Плашка неполадок */
+    .alert-banner {
+      background: rgba(255, 85, 85, 0.1);
+      border: 1px solid rgba(255, 85, 85, 0.25);
+      border-radius: 8px; padding: 16px; margin-bottom: 24px;
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .alert-icon { font-size: 1.3rem; line-height: 1; color: #ff5555; }
+    .alert-text h3 { font-size: 1rem; color: #fff; margin-bottom: 4px; font-weight: 500; }
+    .alert-text p { font-size: 0.9rem; color: #ccc; line-height: 1.5; }
+
+    /* Карточка игры */
+    .store-card {
+      background: rgba(30,30,30,0.25); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.05); border-radius: 12px;
+      padding: 32px; margin-bottom: 24px;
+    }
+
+    .app-header { display: flex; gap: 28px; align-items: center; margin-bottom: 32px; }
+    
+    .app-icon {
+      width: 120px; height: 120px; border-radius: 22%;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      object-fit: cover; background: #151515; flex-shrink: 0;
+    }
+
+    .app-title-box { flex: 1; }
+    .app-title-box h1 { font-size: 1.8rem; color: #fff; font-weight: 500; margin-bottom: 4px; }
+    .app-developer { font-size: 0.95rem; color: #aaa; margin-bottom: 12px; }
+    .app-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tag { font-size: 0.75rem; background: rgba(255,255,255,0.07); padding: 4px 10px; border-radius: 4px; color: #ccc; }
+
+    /* Кнопка скачать */
+    .btn-download {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; max-width: 280px; text-decoration: none; color: #0a0a0a;
+      background: #fff; padding: 14px 24px; border-radius: 6px;
+      font-weight: 700; font-size: 1rem; transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(255,255,255,0.1); border: none; cursor: pointer;
+    }
+    .btn-download:hover { background: #e0e0e0; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,255,255,0.15); }
+    .btn-download:active { transform: translateY(0); }
+
+    /* Горизонтальная карусель скриншотов */
+    .section-title { font-size: 1.1rem; color: #fff; font-weight: 500; margin-bottom: 16px; padding-left: 4px; }
+    
+    .carousel-container { position: relative; margin-bottom: 32px; }
+    .carousel {
+      display: flex; gap: 14px; overflow-x: auto;
+      scroll-snap-type: x mandatory; padding-bottom: 12px;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+    .carousel img {
+      flex: 0 0 auto; width: 280px; height: 160px;
+      object-fit: cover; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+      scroll-snap-align: start; background: #151515;
+      transition: border-color 0.3s, transform 0.3s;
+      cursor: pointer;
+    }
+    .carousel img:hover { border-color: rgba(255,255,255,0.3); transform: scale(1.02); }
+
+    /* Описание */
+    .description { font-size: 0.95rem; line-height: 1.7; color: #b0b0b0; }
+    .description p { margin-bottom: 12px; }
+
+    footer {
+      text-align: center; padding: 24px; color: #666; font-size: 0.85rem;
+      border-top: 1px solid rgba(255,255,255,0.03); background: rgba(15,15,15,0.5);
+      margin-top: auto;
+    }
+
+    /* --- ЛАЙТБОКС (Галерея) --- */
+    .lightbox {
+      display: none; position: fixed; z-index: 9999; top: 0; left: 0;
+      width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(8px); justify-content: center; align-items: center;
+      opacity: 0; transition: opacity 0.3s ease;
+    }
+    .lightbox.active { display: flex; opacity: 1; }
+    
+    .lightbox-img-wrapper { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
+    
+    .lightbox img {
+      max-width: 90%; max-height: 85vh; border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+      transform: scale(0.95); transition: transform 0.3s ease;
+      user-select: none; /* чтобы при свайпе не выделялась картинка */
+    }
+    .lightbox.active img { transform: scale(1); }
+
+    /* Кнопки навигации */
+    .lightbox-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      color: rgba(255,255,255,0.7); font-size: 40px; cursor: pointer;
+      user-select: none; padding: 15px; z-index: 10001;
+      transition: all 0.2s; background: rgba(0,0,0,0.3);
+      border-radius: 50%; width: 60px; height: 60px;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .lightbox-nav:hover { color: #fff; background: rgba(255,255,255,0.15); transform: translateY(-50%) scale(1.1); }
+    .lightbox-prev { left: 40px; }
+    .lightbox-next { right: 40px; }
+
+    .lightbox-close {
+      position: absolute; top: 20px; right: 30px;
+      color: rgba(255,255,255,0.7); font-size: 45px; cursor: pointer;
+      line-height: 1; user-select: none; z-index: 10000;
+      transition: color 0.2s, transform 0.2s;
+    }
+    .lightbox-close:hover { color: #ff5555; transform: scale(1.1); }
+
+    /* --- АДАПТИВНОСТЬ --- */
+    @media (max-width: 600px) {
+      header { padding: 12px 16px; }
+      .brand { font-size: 1.1rem; }
+      .container { padding: 16px 12px; }
+      .store-card { padding: 20px 16px; }
+      
+      .app-header { flex-direction: column; text-align: center; gap: 12px; margin-bottom: 20px; }
+      .app-icon { width: 90px; height: 90px; border-radius: 20%; }
+      .app-title-box h1 { font-size: 1.5rem; }
+      
+      .btn-download { max-width: 100%; padding: 16px; font-size: 1.05rem; }
+      
+      .carousel { gap: 10px; padding-bottom: 16px; }
+      .carousel img { width: 80%; height: auto; aspect-ratio: 16/9; }
+      
+      /* Адаптация лайтбокса для телефона */
+      .lightbox-close { top: 15px; right: 20px; font-size: 40px; }
+      .lightbox-nav { font-size: 28px; width: 45px; height: 45px; background: rgba(0,0,0,0.5); }
+      .lightbox-prev { left: 10px; }
+      .lightbox-next { right: 10px; }
+      .lightbox img { max-width: 100%; border-radius: 0; } /* На телефоне фото на всю ширину */
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">Tryander-games</div>
+  </header>
+
+  <div class="container">
+    
+    <div class="alert-banner fade-in-up">
+      <div class="alert-icon">⚠</div>
+      <div class="alert-text">
+        <h3>Временные неполадки с сервером</h3>
+        <p>Основная база данных и игровой каталог сейчас находятся на техническом обслуживании. Я развернул эту облегчённую (Lite) версию страницы, чтобы вы могли беспрепятственно загрузить мой главный проект.</p>
+      </div>
+    </div>
+
+    <div class="store-card fade-in-up" style="animation-delay: 0.15s;">
+      
+      <div class="app-header">
+        <img src="ava.png" alt="The-75-School-2 Icon" class="app-icon">
+        <div class="app-title-box">
+          <h1>The-75-School-2</h1>
+          <div class="app-developer">Александр (TryAnder-dev)</div>
+          <div class="app-tags">
+            <span class="tag">Симулятор</span>
+            <span class="tag">Приключения</span>
+            <span class="tag">Android Game</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 32px;">
+        <a href="https://github.com/tryander-dev/The-75-School-2/releases/download/game/TheSchool2.apk" class="btn-download" download>
+          <span>⬇ Скачать APK</span>
+        </a>
+      </div>
+
+      <h2 class="section-title">Скриншоты проекта</h2>
+      <div class="carousel-container">
+        <div class="carousel">
+          <img src="images/1.png" alt="Скриншот 1">
+          <img src="images/2.png" alt="Скриншот 2">
+          <img src="images/3.png" alt="Скриншот 3">
+          <img src="images/4.png" alt="Скриншот 4">
+          <img src="images/5.png" alt="Скриншот 5">
+          <img src="images/6.png" alt="Скриншот 6">
+          <img src="images/7.png" alt="Скриншот 7">
+          <img src="images/8.png" alt="Скриншот 8">
+          <img src="images/9.png" alt="Скриншот 9">
+          <img src="images/10.png" alt="Скриншот 10">
+        </div>
+      </div>
+
+      <h2 class="section-title">Описание</h2>
+      <div class="description">
+        <p>Добро пожаловать в обновлённую версию моего симулятора! Исследуйте детально воссозданные локации, взаимодействуйте с окружением и окунитесь в уникальную атмосферу проекта.</p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer>
+    © 2026 Александр (TryAnder) - Разработка IT решений
+  </footer>
+
+  <div class="lightbox" id="lightbox">
+    <span class="lightbox-close" id="lightbox-close">&times;</span>
+    <div class="lightbox-nav lightbox-prev" id="lightbox-prev">&#10094;</div>
+    <div class="lightbox-img-wrapper">
+      <img id="lightbox-img" src="" alt="Увеличенный скриншот">
+    </div>
+    <div class="lightbox-nav lightbox-next" id="lightbox-next">&#10095;</div>
+  </div>
+
+  <script>
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const closeBtn = document.getElementById('lightbox-close');
+    const btnPrev = document.getElementById('lightbox-prev');
+    const btnNext = document.getElementById('lightbox-next');
+    
+    // Получаем все картинки как массив, чтобы знать их индексы
+    const images = Array.from(document.querySelectorAll('.carousel img'));
+    let currentIndex = 0;
+
+    // Функция обновления картинки
+    function showImage(index) {
+      if (index < 0) {
+        currentIndex = images.length - 1; // Крутим в конец
+      } else if (index >= images.length) {
+        currentIndex = 0; // Крутим в начало
+      } else {
+        currentIndex = index;
+      }
+      lightboxImg.src = images[currentIndex].src;
+    }
+
+    // Клик по превьюшкам
+    images.forEach((img, index) => {
+      img.addEventListener('click', () => {
+        showImage(index);
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    // Кнопки Вперед / Назад
+    btnPrev.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showImage(currentIndex - 1);
+    });
+    
+    btnNext.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showImage(currentIndex + 1);
+    });
+
+    // Закрытие
+    const closeLightbox = () => {
+      lightbox.classList.remove('active');
+      document.body.style.overflow = 'auto';
+    };
+
+    closeBtn.addEventListener('click', closeLightbox);
+    
+    // Закрытие при клике мимо фото и кнопок
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox || e.target.classList.contains('lightbox-img-wrapper')) {
+        closeLightbox();
+      }
+    });
+
+    // --- Управление с клавиатуры ---
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') showImage(currentIndex - 1);
+      if (e.key === 'ArrowRight') showImage(currentIndex + 1);
+    });
+
+    // --- Свайпы для телефонов ---
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    lightbox.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, {passive: true});
+
+    lightbox.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, {passive: true});
+
+    function handleSwipe() {
+      const swipeDistance = touchStartX - touchEndX;
+      // Если провели пальцем больше чем на 50 пикселей
+      if (swipeDistance > 50) {
+        showImage(currentIndex + 1); // Свайп влево (следующая)
+      } else if (swipeDistance < -50) {
+        showImage(currentIndex - 1); // Свайп вправо (предыдущая)
+      }
+    }
+  </script>
+
+</body>
+</html>
